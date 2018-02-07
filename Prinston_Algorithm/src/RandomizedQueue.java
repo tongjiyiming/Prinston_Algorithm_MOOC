@@ -84,9 +84,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         
         int ind = StdRandom.uniform(N); // notice the wrap-around situation
         Item item = (Item) q[(ind + first) % q.length];
-        for (int i = first + ind; i > first; i--) {
-            q[i % q.length] = q[(i - 1) % q.length];
-        }
+        q[(ind + first) % q.length] = q[first];
         q[first] = null;
         N--;
         first++;
