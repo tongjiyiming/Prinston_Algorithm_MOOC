@@ -1,6 +1,8 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import edu.princeton.cs.algs4.StdOut;
+
 
 /**
  * assignment 2: deque implementation.
@@ -43,7 +45,7 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public boolean isEmpty() {
         // is the deque empty?
-        return first == null;
+        return N == 0;
     }
     
     /**
@@ -65,8 +67,13 @@ public class Deque<Item> implements Iterable<Item> {
         
         Node oldFirst = first;
         first = new Node(item);
-        if (isEmpty()) first = last;
-        else first.next = oldFirst; oldFirst.last = first;
+        if (isEmpty()) {
+            last = first;
+        }
+        else {
+            first.next = oldFirst;
+            oldFirst.last = first;
+        }
         N++;
         assert check();
     }
@@ -104,6 +111,7 @@ public class Deque<Item> implements Iterable<Item> {
             first = first.next;
             first.last = null;
         }
+        --N;
         assert check();
         return n.item;
     }
@@ -124,6 +132,7 @@ public class Deque<Item> implements Iterable<Item> {
             last = last.last;
             last.next = null;
         }
+        --N;
         assert check();
         return n.item;
     }
@@ -199,45 +208,50 @@ public class Deque<Item> implements Iterable<Item> {
             n = n.next;
         }
         StdOut.println(s + ">last");
+        StdOut.println("first element: " + first.item);
+        StdOut.println("last element: " + last.item);
+        StdOut.println("is deque empty? " + isEmpty());
+        StdOut.println("size of deque? " + size());
     }
     
+    /**
+     * test client.
+     * @param args
+     */
     public static void main(String[] args) {
         // unit testing (optional)
         Deque<Integer> deq = new Deque<Integer>();
-        StdOut.println("is deque empty? " + deq.isEmpty());
-        StdOut.println("size of deque? " + deq.size());
         try {
             deq.addLast(null);
         }
         catch (IllegalArgumentException e) {
             StdOut.println("addLast take a null arguement test passed!");
         };
-        deq.addLast(1); deq.addLast(2);deq.addLast(3);
-        StdOut.println("is deque empty? " + deq.isEmpty());
-        StdOut.println("size of deque? " + deq.size());
-        deq.printDeque();
         try {
             deq.addFirst(null);
         }
         catch (IllegalArgumentException e) {
             StdOut.println("addFirst take a null arguement test passed!");
         };
-        deq.addFirst(-1); deq.addFirst(-2); deq.addFirst(-3);
-        StdOut.println("is deque empty? " + deq.isEmpty());
-        StdOut.println("size of deque? " + deq.size());
+        deq.addFirst(-1); 
+        deq.addFirst(-2); 
+        deq.addFirst(-3);
+        deq.printDeque();
+        deq.addLast(1); deq.addLast(2);deq.addLast(3);
         deq.printDeque();
         
+        StdOut.println("remove first: " + deq.removeFirst());
+        StdOut.println("remove first: " + deq.removeFirst());
 //        StdOut.println(deq.removeFirst());
-//        StdOut.println(deq.removeFirst());
-//        StdOut.println(deq.removeFirst());
+        StdOut.println("remove last: " +  deq.removeLast());
 //        StdOut.println(deq.removeLast());
 //        StdOut.println(deq.removeLast());
-//        StdOut.println(deq.removeLast());
-//        deq.printDeque();
+        deq.printDeque();
         
         for (Integer i : deq) {
             StdOut.println(i);
         }
+        
         deq.printDeque();
         
         

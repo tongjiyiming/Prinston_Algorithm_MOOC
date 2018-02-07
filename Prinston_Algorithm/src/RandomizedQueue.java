@@ -2,8 +2,14 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdOut;
 
-
+/**
+ * assignment 2: RandomizedQueue class.
+ * @author liming
+ *
+ * @param <Item>
+ */
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Object[] q;       // queue elements
     private int N;          // number of elements on queue
@@ -13,7 +19,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     /**
      * Initializes an empty queue.
      */
-    @SuppressWarnings("unchecked")
     public RandomizedQueue() {
         // construct an empty randomized queue
         q = new Object[2];
@@ -76,9 +81,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     public Item dequeue() {
         // remove and return a random item
         if (isEmpty()) throw new NoSuchElementException("Queue underflow");
-        @SuppressWarnings("unchecked")
-        Item item = (Item) q[first];
-        q[first] = null;                            // to avoid loitering
+        
+        int ind = StdRandom.uniform(N); // notice the wrap-around situation
+        Item item = (Item) q[(ind + first) % q.length];
+        for (int i = first + ind; i > first; i--) {
+            q[i % q.length] = q[(i - 1) % q.length];
+        }
+        q[first] = null;
         N--;
         first++;
         if (first == q.length) first = 0;           // wrap-around
@@ -87,18 +96,61 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return item;
     }
     
+    /**
+     * return a random selected element from queue and return its value.
+     * @return value at a random selected element from queue
+     */
     public Item sample() {
         // return a random item (but do not remove it)
-        if (isEmpty()) throw new NoSuchElementException("error: sample() since deque is empty!");
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
         
-        int index = StdRandom.uniform(N);
-        return null;
-    }
-    public Iterator<Item> iterator() {
-        // return an independent iterator over items in random order
-        return null;
+        int ind = StdRandom.uniform(N); // notice the wrap-around situation
+        return (Item) q[(ind + first) % q.length];
     }
     
+    /**
+     * Returns an iterator that iterates over the items in this queue at uniformly random order.
+     * @return an iterator that iterates over the items in this queue at uniformly random order
+     */
+    public Iterator<Item> iterator() {
+        // return an independent iterator over items in random order
+        return new ArrayIterator();
+    }
+    
+    private class ArrayIterator implements Iterator<Item>{
+        private int[] order;
+        private int i=0;
+        
+        public ArrayIterator() {
+            order = new int[N];
+            int j = 0;
+            for (int i = first; i < first + N; i++) {
+                order[j] = i % q.length;
+                j++;
+            }
+            StdRandom.shuffle(order);
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return i < N;
+        }
+
+        public void remove()      { throw new UnsupportedOperationException(); }
+        
+        @Override
+        public Item next() {
+            if ( i < N) {
+                Item item = (Item) q[ order[i] ];
+                i++;
+                return item;
+            }
+            else {
+                throw new NoSuchElementException("There is no additional element left in iterator.");
+            }
+        }
+        
+    }
     // helper method to print sequence of element
     private void printQueue() {
         String str = "start< ";
@@ -108,24 +160,55 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
         str = str + " >end";
         StdOut.println(str);
-        StdOut.println("first pointer is at " + q[first]);
-        StdOut.println("last pointer is at " + q[last]);
-        StdOut.println("length of queue: " + N + ", " + String.valueOf(last-first));
+        StdOut.println("is deque empty? " + isEmpty());
+        StdOut.println("number at first pointer is " + q[first]);
+        StdOut.println("number at last pointer is " + q[last]);
+        StdOut.println("length of internal array: " + q.length);
+        StdOut.println("length of queue: " + N + ", " + "first at: " + first
+        + ", last at: " + last);
     }
     
+    /**
+     * test client.
+     * @param args
+     */
     public static void main(String[] args) {
         // unit testing (optional)
-        RandomizedQueue<Integer> deq = new RandomizedQueue<Integer>();
-        StdOut.println("is deque empty? " + deq.isEmpty());
-        StdOut.println("size of deque? " + deq.size());
+        RandomizedQueue<String> deq = new RandomizedQueue<String>();
+        deq.printQueue();
         try {
             deq.enqueue(null);
         }
         catch (IllegalArgumentException e) {
             StdOut.println("enqueue take a null arguement test passed!");
         };
-        deq.enqueue(1); deq.enqueue(2);deq.enqueue(3);
-//        StdOut.println((Integer[]) deq.q);
+        deq.enqueue("1"); deq.enqueue("2"); deq.enqueue("3"); deq.enqueue("4"); deq.enqueue("5"); deq.enqueue("6"); 
+        deq.enqueue("7"); deq.enqueue("8");
         deq.printQueue();
+        
+        StdOut.println("dequeue: " + deq.dequeue());
+        StdOut.println("dequeue: " + deq.dequeue());
+        StdOut.println("dequeue: " + deq.dequeue());
+        deq.printQueue();
+        
+        deq.enqueue("a"); deq.enqueue("b"); deq.enqueue("c");
+        deq.printQueue();
+        
+        StdOut.println("dequeue: " + deq.dequeue());
+        StdOut.println("dequeue: " + deq.dequeue());
+        StdOut.println("dequeue: " + deq.dequeue());
+        deq.printQueue();
+        
+        Iterator<String> iter = deq.iterator();
+        while (iter.hasNext()) {
+            StdOut.println("iterator return: " + iter.next());
+        }
+        try {
+            iter.next();
+        }
+        catch (NoSuchElementException e) {
+            StdOut.println("iterator reach the end test passed!");
+        }
+                
     }
 }
