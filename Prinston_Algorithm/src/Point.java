@@ -8,41 +8,20 @@
  *
  ******************************************************************************/
 
-import java.util.Comparator;
 import edu.princeton.cs.algs4.StdDraw;
+
+import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
 
     private final int x;     // x-coordinate of this point
     private final int y;     // y-coordinate of this point
-    public final Comparator<Point> Slope_ORDER = new SlopeOrder();
 
-    private class SlopeOrder implements Comparator<Point> {
-//    		private final Point base;
-    		
-//    		public SlopeOrder(Point c) {
-//    			base = c;
-//    		}
-    		
-    		public int compare(Point a, Point b) {
-            double slopeDiff = slopeTo(a) - slopeTo(b);
-//            StdOut.println(Point.this.slopeTo(a));
-//            StdOut.println(Point.this.slopeTo(b));
-            if (slopeDiff > 0) {
-                return 1;
-            } else if (slopeDiff < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
-    		}
-    }
-    
     /**
      * Initializes a new point.
      *
-     * @param  x the <em>x</em>-coordinate of the point
-     * @param  y the <em>y</em>-coordinate of the point
+     * @param x the <em>x</em>-coordinate of the point
+     * @param y the <em>y</em>-coordinate of the point
      */
     public Point(int x, int y) {
         /* DO NOT MODIFY */
@@ -72,20 +51,24 @@ public class Point implements Comparable<Point> {
     /**
      * Returns the slope between this point and the specified point.
      * Formally, if the two points are (x0, y0) and (x1, y1), then the slope
-     * is (y1 - y0) / (x1 - x0). For completeness, the slope is defined to be
+     * is (y1 - y0) / (x1 - x0). For completness, the slope is defined to be
      * +0.0 if the line segment connecting the two points is horizontal;
      * Double.POSITIVE_INFINITY if the line segment is vertical;
      * and Double.NEGATIVE_INFINITY if (x0, y0) and (x1, y1) are equal.
      *
-     * @param  that the other point
+     * @param that the other point
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-   		if (that == null) throw new IllegalArgumentException("error: slopeTo() get a null argument!");
-   		if (this.x == that.x && this.y == that.y) return Double.NEGATIVE_INFINITY;
-    		if (this.y == that.y) return new Double(+0.0);
-    		if (this.x == that.x) return Double.POSITIVE_INFINITY;
-    		return (that.y - this.y)  / (double) (that.x - this.x);
+        if (this.y - that.y == 0) {
+            if (this.x - that.x == 0) {
+                return Double.NEGATIVE_INFINITY;
+            }
+            return +0;
+        } else if (this.x - that.x == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return (that.y - this.y) / (double) (that.x - this.x);
     }
 
     /**
@@ -93,22 +76,19 @@ public class Point implements Comparable<Point> {
      * Formally, the invoking point (x0, y0) is less than the argument point
      * (x1, y1) if and only if either y0 < y1 or if y0 = y1 and x0 < x1.
      *
-     * @param  that the other point
+     * @param that the other point
      * @return the value <tt>0</tt> if this point is equal to the argument
-     *         point (x0 = x1 and y0 = y1);
-     *         a negative integer if this point is less than the argument
-     *         point; and a positive integer if this point is greater than the
-     *         argument point
+     * point (x0 = x1 and y0 = y1);
+     * a negative integer if this point is less than the argument
+     * point; and a positive integer if this point is greater than the
+     * argument point
      */
     public int compareTo(Point that) {
-        if (that == null) throw new IllegalArgumentException("error: compareTo() get a null argument!");
-    		if (this.y < that.y) return -1;
-    		if (this.y > that.y) return 1;
-    		if (this.y == that.y) {
-    			if (this.x < that.x) return -1;
-    			if (this.x > that.x) return 1;
-    		}
-			return 0;
+        int diff = this.y - that.y;
+        if (diff == 0) {
+            diff = this.x - that.x;
+        }
+        return diff;
     }
 
     /**
@@ -118,8 +98,21 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        return new SlopeOrder();
+        return new Comparator<Point>() {
+            @Override
+            public int compare(Point point1, Point point2) {
+                double slopeDiff = slopeTo(point1) - slopeTo(point2);
+                if (slopeDiff > 0) {
+                    return 1;
+                } else if (slopeDiff < 0) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
     }
+
 
     /**
      * Returns a string representation of this point.
@@ -133,14 +126,4 @@ public class Point implements Comparable<Point> {
         return "(" + x + ", " + y + ")";
     }
 
-    /**
-     * Unit tests the Point data type.
-     */
-    public static void main(String[] args) {
-        Point a = new Point(0, 3);
-        Point b = new Point(2, 3);
-        StdOut.println(a.toString() + " slope to " + b.toString() + ": " + a.slopeTo(b));
-        Point c = new Point(4, 4);
-        StdOut.println(c.Slope_ORDER.compare(a, b));
-    }
 }
