@@ -58,13 +58,13 @@ public class BruteCollinearPoints {
 	
 	private PointPair maximalLineSegment(Point[] pointsInLine) {
 		Point min = pointsInLine[0];
-		for ( int i=1; i < pointsInLine.length && min.compareTo(pointsInLine[i]) > 0; i++) {
-			min = pointsInLine[i];
+		for ( int i=1; i < pointsInLine.length; i++) {
+			if ( min.compareTo(pointsInLine[i]) > 0 ) min = pointsInLine[i];
 		}
 		
 		Point max = pointsInLine[0];
-		for ( int i=1; i < pointsInLine.length && max.compareTo(pointsInLine[i]) < 0; i++) {
-			max = pointsInLine[i];
+		for ( int i=1; i < pointsInLine.length; i++) {
+			if ( max.compareTo(pointsInLine[i]) < 0 ) max = pointsInLine[i];
 		}
 		
 		PointPair pp = new PointPair();
@@ -86,7 +86,7 @@ public class BruteCollinearPoints {
 		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
 		int ind = Arrays.binarySearch(pps, pp, pp.slopeOrder());
 		
-		if ( ind >=0 ) {
+		if ( ind >=0 && pp.slope != pp.small.slopeTo(pps[ind].small)) {
 			if ( pps[ind].small.compareTo(pp.small) > 0 ) pps[ind].small = pp.small;
 			if ( pps[ind].large.compareTo(pp.large) < 0 ) pps[ind].large = pp.large;
 		}
@@ -125,17 +125,17 @@ public class BruteCollinearPoints {
 		return lineSegments.toArray(new LineSegment[lineSegments.size()]);
 	}
 	
-	public static void main(String[] args) {
+//	public static void main(String[] args) {
 
 	    // read the n points from a file
-	    In in = new In(args[0]);
-	    int n = in.readInt();
-	    Point[] points = new Point[n];
-	    for (int i = 0; i < n; i++) {
-	        int x = in.readInt();
-	        int y = in.readInt();
-	        points[i] = new Point(x, y);
-	    }
+//	    In in = new In(args[0]);
+//	    int n = in.readInt();
+//	    Point[] points = new Point[n];
+//	    for (int i = 0; i < n; i++) {
+//	        int x = in.readInt();
+//	        int y = in.readInt();
+//	        points[i] = new Point(x, y);
+//	    }
 
 	    // draw the points
 //	    StdDraw.enableDoubleBuffering();
@@ -147,11 +147,11 @@ public class BruteCollinearPoints {
 //	    StdDraw.show();
 
 	    // print and draw the line segments
-	    BruteCollinearPoints collinear = new BruteCollinearPoints(points);
-	    for (LineSegment segment : collinear.segments()) {
-	        StdOut.println(segment);
+//	    BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+//	    for (LineSegment segment : collinear.segments()) {
+//	        StdOut.println(segment);
 //	        segment.draw();
-	    }
+//	    }
 //	    StdDraw.show();
-	}
+//	}
 }

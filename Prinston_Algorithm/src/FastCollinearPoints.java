@@ -14,8 +14,8 @@ public class FastCollinearPoints {
 		validatePoints(points);
 
 		Point[] pointsCopy = Arrays.copyOf(points, points.length);
-		while (pointsCopy.length > 3 && pointsCopy != null) {
-			pointsCopy = findCollinearOfFirstPoint(pointsCopy);
+		for ( int i=0; i < pointsCopy.length; i++) {
+			findCollinearOfFirstPoint(pointsCopy, i);
 		}
    }
    
@@ -28,10 +28,9 @@ public class FastCollinearPoints {
 	        return new Comparator<PointPair>() {
 	            @Override
 	            public int compare(PointPair pp1, PointPair pp2) {
-	                double slopeDiff = pp1.slope - pp2.slope;
-	                if (slopeDiff > 0) {
+	                if (pp1.slope > pp2.slope) {
 	                    return 1;
-	                } else if (slopeDiff < 0) {
+	                } else if (pp1.slope < pp2.slope) {
 	                    return -1;
 	                } else {
 	                    return 0;
@@ -41,10 +40,10 @@ public class FastCollinearPoints {
 		}
 	}
 	
-   private Point[] findCollinearOfFirstPoint(Point[] pointsCopy) {
+   private void findCollinearOfFirstPoint(Point[] pointsCopy, int n) {
 	   // use the first point as origin, and check if it has other collinear points, if not, delect it
 	   // if there are, delect all the the 3 or more collinear points and return the remaining points
-	   Point p = pointsCopy[0];
+	   Point p = pointsCopy[n];
 	   Arrays.sort(pointsCopy, p.slopeOrder());
 	   int i = 1;
 	   while ( i < pointsCopy.length - 2 ) {
@@ -67,7 +66,15 @@ public class FastCollinearPoints {
 					   k++;
 				   }
 				   
-				   PointPair pp = maximalLineSegment(Arrays.copyOfRange(pointsCopy, i, k+1));
+				   // copy all points in collinear
+				   Point[] pps = new Point[k-i+2];
+				   pps[0] = p;
+				   for ( int m=i; m <= k; m++) {
+					   pps[m-i+1] = pointsCopy[m];
+				   }
+				   
+				   // check maximal point pair and add to lineSegments
+				   PointPair pp = maximalLineSegment(pps);
 				   addLineSegment( pp );
 				   i = k+1;
 			   }
@@ -78,18 +85,17 @@ public class FastCollinearPoints {
 	   for ( int h=1; h < pointsCopy.length; h++) {
 		   m[h-1] = pointsCopy[h];
 	   }
-	   return m;
    }
 
 	private PointPair maximalLineSegment(Point[] pointsInLine) {
 		Point min = pointsInLine[0];
-		for ( int i=1; i < pointsInLine.length && min.compareTo(pointsInLine[i]) > 0; i++) {
-			min = pointsInLine[i];
+		for ( int i=1; i < pointsInLine.length; i++) {
+			if ( min.compareTo(pointsInLine[i]) > 0 ) min = pointsInLine[i];
 		}
 		
 		Point max = pointsInLine[0];
-		for ( int i=1; i < pointsInLine.length && max.compareTo(pointsInLine[i]) < 0; i++) {
-			max = pointsInLine[i];
+		for ( int i=1; i < pointsInLine.length; i++) {
+			if ( max.compareTo(pointsInLine[i]) < 0 ) max = pointsInLine[i];
 		}
 		
 		PointPair pp = new PointPair();
@@ -103,7 +109,7 @@ public class FastCollinearPoints {
 		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
 		int ind = Arrays.binarySearch(pps, pp, pp.slopeOrder());
 		
-		if ( ind >=0 ) {
+		if ( ind >=0 && pp.slope != pp.small.slopeTo(pps[ind].small)) {
 			if ( pps[ind].small.compareTo(pp.small) > 0 ) pps[ind].small = pp.small;
 			if ( pps[ind].large.compareTo(pp.large) < 0 ) pps[ind].large = pp.large;
 		}
@@ -143,17 +149,17 @@ public class FastCollinearPoints {
 		if (points[points.length-1] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
 	}
 	
-	public static void main(String[] args) {
-
+//	public static void main(String[] args) {
+//		StdOut.println(Double.NEGATIVE_INFINITY < 0);
 	    // read the n points from a file
-	    In in = new In(args[0]);
-	    int n = in.readInt();
-	    Point[] points = new Point[n];
-	    for (int i = 0; i < n; i++) {
-	        int x = in.readInt();
-	        int y = in.readInt();
-	        points[i] = new Point(x, y);
-	    }
+//	    In in = new In(args[0]);
+//	    int n = in.readInt();
+//	    Point[] points = new Point[n];
+//	    for (int i = 0; i < n; i++) {
+//	        int x = in.readInt();
+//	        int y = in.readInt();
+//	        points[i] = new Point(x, y);
+//	    }
 
 	    // draw the points
 //	    StdDraw.enableDoubleBuffering();
@@ -165,11 +171,11 @@ public class FastCollinearPoints {
 //	    StdDraw.show();
 
 	    // print and draw the line segments
-	    FastCollinearPoints collinear = new FastCollinearPoints(points);
-	    for (LineSegment segment : collinear.segments()) {
-	        StdOut.println(segment);
+//	    FastCollinearPoints collinear = new FastCollinearPoints(points);
+//	    for (LineSegment segment : collinear.segments()) {
+//	        StdOut.println(segment);
 //	        segment.draw();
-	    }
+//	    }
 //	    StdDraw.show();
-	}
+//	}
 }

@@ -16,6 +16,7 @@ public class Point implements Comparable<Point> {
 
     private final int x;     // x-coordinate of this point
     private final int y;     // y-coordinate of this point
+//    public final Comparator<Point> Slope_Order = new slopeOrder();
 
     /**
      * Initializes a new point.
@@ -60,14 +61,16 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-        if (this.y - that.y == 0) {
-            if (this.x - that.x == 0) {
-                return Double.NEGATIVE_INFINITY;
-            }
+        if (this.y == that.y && this.x == that.x) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        else if ( this.y == that.y && this.x != that.x ) {
             return +0;
-        } else if (this.x - that.x == 0) {
+        } 
+        else if (this.y != that.y && this.x == that.x) {
             return Double.POSITIVE_INFINITY;
         }
+        
         return (that.y - this.y) / (double) (that.x - this.x);
     }
 
@@ -88,6 +91,7 @@ public class Point implements Comparable<Point> {
         if (diff == 0) {
             diff = this.x - that.x;
         }
+        
         return diff;
     }
 
