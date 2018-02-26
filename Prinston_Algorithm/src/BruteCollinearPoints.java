@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+
+
 public class BruteCollinearPoints {
 	private List<LineSegment> lineSegments = new ArrayList<LineSegment>();
 	private int numberOfSegments;
@@ -38,21 +40,21 @@ public class BruteCollinearPoints {
 		public Point large;
 		public double slope;
 		
-//		public Comparator<PointPair> slopeOrder(){
-//	        return new Comparator<PointPair>() {
-//	            @Override
-//	            public int compare(PointPair pp1, PointPair pp2) {
-//	                double slopeDiff = pp1.slope - pp2.slope;
-//	                if (slopeDiff > 0) {
-//	                    return 1;
-//	                } else if (slopeDiff < 0) {
-//	                    return -1;
-//	                } else {
-//	                    return 0;
-//	                }
-//	            }
-//	        };
-//		}
+		public Comparator<PointPair> slopeOrder(){
+	        return new Comparator<PointPair>() {
+	            @Override
+	            public int compare(PointPair pp1, PointPair pp2) {
+	                double slopeDiff = pp1.slope - pp2.slope;
+	                if (slopeDiff > 0) {
+	                    return 1;
+	                } else if (slopeDiff < 0) {
+	                    return -1;
+	                } else {
+	                    return 0;
+	                }
+	            }
+	        };
+		}
 	}
 	
 	private PointPair maximalLineSegment(Point[] pointsInLine) {
@@ -106,14 +108,13 @@ public class BruteCollinearPoints {
 	
 	private void validatePoints(Point[] points) {
 		if (points == null) throw new java.lang.IllegalArgumentException("points inputs is null!");
-		for (int p=0; p < points.length-1; p++) {
+		for (int p=0; p < points.length; p++) {
 			if (points[p] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
-			for (int q=p+1; q < points.length; q++) {
-				if (points[p].compareTo(points[q]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
-			}
 		}
-		if (points[points.length-1] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
-	}
+		for (int p=0; p < points.length-1; p++) {
+			if (points[p].compareTo(points[p+1]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
+		}
+}
 	
 	/**
 	 * return the number of found line segments
@@ -131,37 +132,5 @@ public class BruteCollinearPoints {
 	public LineSegment[] segments() {
 		// the line segments
 		return lineSegments.toArray(new LineSegment[lineSegments.size()]);
-	}
-	
-	public static void main(String[] args) {
-
-//	     read the n points from a file
-	    In in = new In(args[0]);
-	    int n = in.readInt();
-	    Point[] points = new Point[n];
-	    for (int i = 0; i < n; i++) {
-	        int x = in.readInt();
-	        int y = in.readInt();
-	        points[i] = new Point(x, y);
-	    }
-
-	    // draw the points
-//	    StdDraw.enableDoubleBuffering();
-//	    StdDraw.setXscale(0, 32768);
-//	    StdDraw.setYscale(0, 32768);
-//	    for (Point p : points) {
-//	        p.draw();
-//	    }
-//	    StdDraw.show();
-
-	    // print and draw the line segments
-	    BruteCollinearPoints collinear = new BruteCollinearPoints(points);
-	    for (LineSegment segment : collinear.segments()) {
-	        StdOut.println(segment);
-//	        segment.draw();
-	    }
-	    StdOut.println("occurances of output segments: " + collinear.segments().length);
-	    StdOut.println("occurances of output segments: " + collinear.numberOfSegments);
-//	    StdDraw.show();
 	}
 }

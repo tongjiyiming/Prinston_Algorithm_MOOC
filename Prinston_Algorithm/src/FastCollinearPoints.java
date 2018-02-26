@@ -15,17 +15,17 @@ public class FastCollinearPoints {
 
 		Point[] pointsCopy = Arrays.copyOf(points, points.length);
 		for ( int i=0; i < pointsCopy.length; i++) {
-			findCollinearOfFirstPoint(pointsCopy, i);
+			findCollinearOfPoint(pointsCopy, i);
 		}
    }
    
 	//helper class
-	private class PointPair{
+	private static class PointPair{
 		public Point small;
 		public Point large;
 		public double slope;
 		
-		public Comparator<PointPair> slopeOrder(){
+		public static Comparator<PointPair> slopeOrder(){
 	        return new Comparator<PointPair>() {
 	            @Override
 	            public int compare(PointPair pp1, PointPair pp2) {
@@ -41,7 +41,7 @@ public class FastCollinearPoints {
 		}
 	}
 	
-   private void findCollinearOfFirstPoint(Point[] pointsCopy, int n) {
+   private void findCollinearOfPoint(Point[] pointsCopy, int n) {
 	   // use the first point as origin, and check if it has other collinear points, if not, delect it
 	   // if there are, delect all the the 3 or more collinear points and return the remaining points
 	   Point p = pointsCopy[n];
@@ -81,22 +81,17 @@ public class FastCollinearPoints {
 			   }
 		   }
 	   }
-	   
-	   Point[] m = new Point[pointsCopy.length-1];
-	   for ( int h=1; h < pointsCopy.length; h++) {
-		   m[h-1] = pointsCopy[h];
-	   }
    }
-
+	
 	private PointPair maximalLineSegment(Point[] pointsInLine) {
 		Point min = pointsInLine[0];
 		for ( int i=1; i < pointsInLine.length; i++) {
-			if ( min.compareTo(pointsInLine[i]) > 0 ) min = pointsInLine[i];
+			if ( min.compareTo(pointsInLine[i]) >= 0 ) min = pointsInLine[i];
 		}
 		
 		Point max = pointsInLine[0];
 		for ( int i=1; i < pointsInLine.length; i++) {
-			if ( max.compareTo(pointsInLine[i]) < 0 ) max = pointsInLine[i];
+			if ( max.compareTo(pointsInLine[i]) <= 0 ) max = pointsInLine[i];
 		}
 		
 		PointPair pp = new PointPair();
@@ -106,19 +101,40 @@ public class FastCollinearPoints {
 		return pp;
 	}
 	
+	private boolean isTwoPointPairCollinear(PointPair pp1, PointPair pp2) {
+		// if this pair is collinear with another pair
+		return pp1.small.slopeTo(pp2.large) == pp1.large.slopeTo(pp2.small) 
+				&& pp1.large.slopeTo(pp2.large) == pp1.small.slopeTo(pp2.small);
+	}
+	
 	private void addLineSegment(PointPair pp) {
-		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
-		int ind = Arrays.binarySearch(pps, pp, pp.slopeOrder());
+//		pointPairs.sort(PointPair.slopeOrder());
+//		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
+//		int ind = Arrays.binarySearch(pps, pp, PointPair.slopeOrder());
+//		
+//		if ( ind >=0 && isTwoPointPairCollinear(pps[ind], pp) ) {
+//			// update this list if this pair is collinear with another pair;
+//			PointPair new_pp = maximalLineSegment(new Point[] {pps[ind].small, pps[ind].large, pp.small, pp.large});
+//			pointPairs.set(ind, new_pp);
+//		}
+//		else {
+//			lineSegments.add(new LineSegment(pp.small, pp.large));
+//			pointPairs.add(pp);
+//			numberOfSegments++;
+//		}
+		for (int i=0; i < pointPairs.size(); i++) {
+			PointPair exist_pp = pointPairs.get(i);
+			if ( exist_pp.slope == pp.slope && isTwoPointPairCollinear(exist_pp, pp) ) {
+		        // update this list if this pair is collinear with another pair;
+				PointPair new_pp = maximalLineSegment(new Point[] {exist_pp.small, exist_pp.large, pp.small, pp.large});
+				pointPairs.set(i, new_pp);
+				return;
+			}
+		}
 		
-		if ( ind >=0 && pp.slope != pp.small.slopeTo(pps[ind].small)) {
-			if ( pps[ind].small.compareTo(pp.small) > 0 ) pps[ind].small = pp.small;
-			if ( pps[ind].large.compareTo(pp.large) < 0 ) pps[ind].large = pp.large;
-		}
-		else {
-			lineSegments.add(new LineSegment(pp.small, pp.large));
-			pointPairs.add(pp);
-			numberOfSegments++;
-		}
+		lineSegments.add(new LineSegment(pp.small, pp.large));
+		pointPairs.add(pp);
+		numberOfSegments++;
 	}
 	
 	/**
@@ -140,45 +156,12 @@ public class FastCollinearPoints {
    }
    
 	private void validatePoints(Point[] points) {
-		// validate the input array not with null or duplicated point
 		if (points == null) throw new java.lang.IllegalArgumentException("points inputs is null!");
-		for (int p=0; p < points.length-1; p++) {
+		for (int p=0; p < points.length; p++) {
 			if (points[p] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
-			for (int q=p+1; q < points.length; q++) {
-				if (points[p].compareTo(points[q]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
-			}
 		}
-		if (points[points.length-1] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
-	}
-	
-	public static void main(String[] args) {
-//	     read the n points from a file
-	    In in = new In(args[0]);
-	    int n = in.readInt();
-	    Point[] points = new Point[n];
-	    for (int i = 0; i < n; i++) {
-	        int x = in.readInt();
-	        int y = in.readInt();
-	        points[i] = new Point(x, y);
-	    }
-
-	    // draw the points
-//	    StdDraw.enableDoubleBuffering();
-//	    StdDraw.setXscale(0, 32768);
-//	    StdDraw.setYscale(0, 32768);
-//	    for (Point p : points) {
-//	        p.draw();
-//	    }
-//	    StdDraw.show();
-
-	    // print and draw the line segments
-	    FastCollinearPoints collinear = new FastCollinearPoints(points);
-	    for (LineSegment segment : collinear.segments()) {
-	        StdOut.println(segment);
-//	        segment.draw();
-	    }
-	    StdOut.println("occurances of output segments: " + collinear.segments().length);
-	    StdOut.println("occurances of output segments: " + collinear.numberOfSegments);
-//	    StdDraw.show();
+		for (int p=0; p < points.length-1; p++) {
+			if (points[p].compareTo(points[p+1]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
+		}
 	}
 }
