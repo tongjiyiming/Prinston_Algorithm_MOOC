@@ -19,6 +19,7 @@ public class FastCollinearPoints {
 		}
    }
    
+	//helper class
 	private class PointPair{
 		public Point small;
 		public Point large;
@@ -116,6 +117,7 @@ public class FastCollinearPoints {
 		else {
 			lineSegments.add(new LineSegment(pp.small, pp.large));
 			pointPairs.add(pp);
+			numberOfSegments++;
 		}
 	}
 	
@@ -149,17 +151,16 @@ public class FastCollinearPoints {
 		if (points[points.length-1] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
 	}
 	
-//	public static void main(String[] args) {
-//		StdOut.println(Double.NEGATIVE_INFINITY < 0);
-	    // read the n points from a file
-//	    In in = new In(args[0]);
-//	    int n = in.readInt();
-//	    Point[] points = new Point[n];
-//	    for (int i = 0; i < n; i++) {
-//	        int x = in.readInt();
-//	        int y = in.readInt();
-//	        points[i] = new Point(x, y);
-//	    }
+	public static void main(String[] args) {
+//	     read the n points from a file
+	    In in = new In(args[0]);
+	    int n = in.readInt();
+	    Point[] points = new Point[n];
+	    for (int i = 0; i < n; i++) {
+	        int x = in.readInt();
+	        int y = in.readInt();
+	        points[i] = new Point(x, y);
+	    }
 
 	    // draw the points
 //	    StdDraw.enableDoubleBuffering();
@@ -171,11 +172,13 @@ public class FastCollinearPoints {
 //	    StdDraw.show();
 
 	    // print and draw the line segments
-//	    FastCollinearPoints collinear = new FastCollinearPoints(points);
-//	    for (LineSegment segment : collinear.segments()) {
-//	        StdOut.println(segment);
+	    FastCollinearPoints collinear = new FastCollinearPoints(points);
+	    for (LineSegment segment : collinear.segments()) {
+	        StdOut.println(segment);
 //	        segment.draw();
-//	    }
+	    }
+	    StdOut.println("occurances of output segments: " + collinear.segments().length);
+	    StdOut.println("occurances of output segments: " + collinear.numberOfSegments);
 //	    StdDraw.show();
-//	}
+	}
 }

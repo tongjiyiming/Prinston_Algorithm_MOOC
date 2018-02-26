@@ -9,6 +9,7 @@
  ******************************************************************************/
 
 import edu.princeton.cs.algs4.StdDraw;
+import java.lang.IllegalArgumentException;
 
 import java.util.Comparator;
 
@@ -26,6 +27,7 @@ public class Point implements Comparable<Point> {
      */
     public Point(int x, int y) {
         /* DO NOT MODIFY */
+    		if ( x < 0 | x > 32767 | y < 0 | y > 32767 ) throw new IllegalArgumentException("the coordinate of Point is not in [0, 32767].");
         this.x = x;
         this.y = y;
     }

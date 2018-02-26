@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -39,21 +38,21 @@ public class BruteCollinearPoints {
 		public Point large;
 		public double slope;
 		
-		public Comparator<PointPair> slopeOrder(){
-	        return new Comparator<PointPair>() {
-	            @Override
-	            public int compare(PointPair pp1, PointPair pp2) {
-	                double slopeDiff = pp1.slope - pp2.slope;
-	                if (slopeDiff > 0) {
-	                    return 1;
-	                } else if (slopeDiff < 0) {
-	                    return -1;
-	                } else {
-	                    return 0;
-	                }
-	            }
-	        };
-		}
+//		public Comparator<PointPair> slopeOrder(){
+//	        return new Comparator<PointPair>() {
+//	            @Override
+//	            public int compare(PointPair pp1, PointPair pp2) {
+//	                double slopeDiff = pp1.slope - pp2.slope;
+//	                if (slopeDiff > 0) {
+//	                    return 1;
+//	                } else if (slopeDiff < 0) {
+//	                    return -1;
+//	                } else {
+//	                    return 0;
+//	                }
+//	            }
+//	        };
+//		}
 	}
 	
 	private PointPair maximalLineSegment(Point[] pointsInLine) {
@@ -83,17 +82,26 @@ public class BruteCollinearPoints {
 	}
 	
 	private void addLineSegment(PointPair pp) {
-		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
-		int ind = Arrays.binarySearch(pps, pp, pp.slopeOrder());
+//		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
+//		int ind = Arrays.binarySearch(pps, pp, pp.slopeOrder());
+//		
+//		if ( ind >=0 && pp.slope != pp.small.slopeTo(pps[ind].small)) {
+//			if ( pps[ind].small.compareTo(pp.small) > 0 ) pps[ind].small = pp.small;
+//			if ( pps[ind].large.compareTo(pp.large) < 0 ) pps[ind].large = pp.large;
+//		}
+//		else {
+//			lineSegments.add(new LineSegment(pp.small, pp.large));
+//			pointPairs.add(pp);
+//		}
+		for ( PointPair exist_pp : pointPairs) {
+			if ( ( exist_pp.small.compareTo(pp.small) == 0 && exist_pp.large.compareTo(pp.large) == 0 )
+					| (exist_pp.small.compareTo(pp.large) == 0 && exist_pp.large.compareTo(pp.small) == 0 ) ) {
+				return;
+			}
+		}
 		
-		if ( ind >=0 && pp.slope != pp.small.slopeTo(pps[ind].small)) {
-			if ( pps[ind].small.compareTo(pp.small) > 0 ) pps[ind].small = pp.small;
-			if ( pps[ind].large.compareTo(pp.large) < 0 ) pps[ind].large = pp.large;
-		}
-		else {
-			lineSegments.add(new LineSegment(pp.small, pp.large));
-			pointPairs.add(pp);
-		}
+		lineSegments.add(new LineSegment(pp.small, pp.large));
+		numberOfSegments++;
 	}
 	
 	private void validatePoints(Point[] points) {
@@ -125,17 +133,17 @@ public class BruteCollinearPoints {
 		return lineSegments.toArray(new LineSegment[lineSegments.size()]);
 	}
 	
-//	public static void main(String[] args) {
+	public static void main(String[] args) {
 
-	    // read the n points from a file
-//	    In in = new In(args[0]);
-//	    int n = in.readInt();
-//	    Point[] points = new Point[n];
-//	    for (int i = 0; i < n; i++) {
-//	        int x = in.readInt();
-//	        int y = in.readInt();
-//	        points[i] = new Point(x, y);
-//	    }
+//	     read the n points from a file
+	    In in = new In(args[0]);
+	    int n = in.readInt();
+	    Point[] points = new Point[n];
+	    for (int i = 0; i < n; i++) {
+	        int x = in.readInt();
+	        int y = in.readInt();
+	        points[i] = new Point(x, y);
+	    }
 
 	    // draw the points
 //	    StdDraw.enableDoubleBuffering();
@@ -147,11 +155,13 @@ public class BruteCollinearPoints {
 //	    StdDraw.show();
 
 	    // print and draw the line segments
-//	    BruteCollinearPoints collinear = new BruteCollinearPoints(points);
-//	    for (LineSegment segment : collinear.segments()) {
-//	        StdOut.println(segment);
+	    BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+	    for (LineSegment segment : collinear.segments()) {
+	        StdOut.println(segment);
 //	        segment.draw();
-//	    }
+	    }
+	    StdOut.println("occurances of output segments: " + collinear.segments().length);
+	    StdOut.println("occurances of output segments: " + collinear.numberOfSegments);
 //	    StdDraw.show();
-//	}
+	}
 }
