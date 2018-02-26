@@ -4,18 +4,17 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class FastCollinearPoints {
+	// assume that is no 5 or more points collinear
 	private List<LineSegment> lineSegments = new ArrayList<LineSegment>();
-	private int numberOfSegments;
 	private List<PointPair> pointPairs = new ArrayList<PointPair>();
+	private int numberOfSegments;
 	
 	public FastCollinearPoints(Point[] points) {
-		// finds all line segments containing 4 or more points
 		// check corner cases
 		validatePoints(points);
 
-		Point[] pointsCopy = Arrays.copyOf(points, points.length);
-		for ( int i=0; i < pointsCopy.length; i++) {
-			findCollinearOfPoint(pointsCopy, i);
+		for ( int i=0; i < points.length; i++) {
+			findCollinearOfPoint(points, i);
 		}
    }
    
@@ -41,11 +40,13 @@ public class FastCollinearPoints {
 		}
 	}
 	
-   private void findCollinearOfPoint(Point[] pointsCopy, int n) {
+   private void findCollinearOfPoint(Point[] points, int n) {
 	   // use the first point as origin, and check if it has other collinear points, if not, delect it
 	   // if there are, delect all the the 3 or more collinear points and return the remaining points
-	   Point p = pointsCopy[n];
+	   Point p = points[n];
+	   Point[] pointsCopy = Arrays.copyOf(points, points.length);
 	   Arrays.sort(pointsCopy, p.slopeOrder());
+	   
 	   int i = 1;
 	   while ( i < pointsCopy.length - 2 ) {
 		   int j = i+1;
@@ -62,20 +63,8 @@ public class FastCollinearPoints {
 			   }
 			   else { 
 				   // find three collinear points
-				   // find if there are more collinear points
-				   while (k < pointsCopy.length-1 && slope_k == p.slopeTo(pointsCopy[k+1])) {
-					   k++;
-				   }
-				   
-				   // copy all points in collinear
-				   Point[] pps = new Point[k-i+2];
-				   pps[0] = p;
-				   for ( int m=i; m <= k; m++) {
-					   pps[m-i+1] = pointsCopy[m];
-				   }
-				   
 				   // check maximal point pair and add to lineSegments
-				   PointPair pp = maximalLineSegment(pps);
+				   PointPair pp = maximalLineSegment(new Point[] {p, pointsCopy[i], pointsCopy[j], pointsCopy[k]});
 				   addLineSegment( pp );
 				   i = k+1;
 			   }
@@ -108,26 +97,13 @@ public class FastCollinearPoints {
 	}
 	
 	private void addLineSegment(PointPair pp) {
-//		pointPairs.sort(PointPair.slopeOrder());
-//		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
-//		int ind = Arrays.binarySearch(pps, pp, PointPair.slopeOrder());
-//		
-//		if ( ind >=0 && isTwoPointPairCollinear(pps[ind], pp) ) {
-//			// update this list if this pair is collinear with another pair;
-//			PointPair new_pp = maximalLineSegment(new Point[] {pps[ind].small, pps[ind].large, pp.small, pp.large});
-//			pointPairs.set(ind, new_pp);
-//		}
-//		else {
-//			lineSegments.add(new LineSegment(pp.small, pp.large));
-//			pointPairs.add(pp);
-//			numberOfSegments++;
-//		}
 		for (int i=0; i < pointPairs.size(); i++) {
 			PointPair exist_pp = pointPairs.get(i);
 			if ( exist_pp.slope == pp.slope && isTwoPointPairCollinear(exist_pp, pp) ) {
 		        // update this list if this pair is collinear with another pair;
 				PointPair new_pp = maximalLineSegment(new Point[] {exist_pp.small, exist_pp.large, pp.small, pp.large});
 				pointPairs.set(i, new_pp);
+				lineSegments.set(i, new LineSegment(new_pp.small, new_pp.large));
 				return;
 			}
 		}
@@ -161,7 +137,9 @@ public class FastCollinearPoints {
 			if (points[p] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
 		}
 		for (int p=0; p < points.length-1; p++) {
-			if (points[p].compareTo(points[p+1]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
+			for (int q=p+1; q < points.length; q++) {
+				if (points[p].compareTo(points[q]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
+			}
 		}
 	}
 }

@@ -84,17 +84,6 @@ public class BruteCollinearPoints {
 	}
 	
 	private void addLineSegment(PointPair pp) {
-//		PointPair[] pps = pointPairs.toArray( new PointPair[pointPairs.size()]);
-//		int ind = Arrays.binarySearch(pps, pp, pp.slopeOrder());
-//		
-//		if ( ind >=0 && pp.slope != pp.small.slopeTo(pps[ind].small)) {
-//			if ( pps[ind].small.compareTo(pp.small) > 0 ) pps[ind].small = pp.small;
-//			if ( pps[ind].large.compareTo(pp.large) < 0 ) pps[ind].large = pp.large;
-//		}
-//		else {
-//			lineSegments.add(new LineSegment(pp.small, pp.large));
-//			pointPairs.add(pp);
-//		}
 		for ( PointPair exist_pp : pointPairs) {
 			if ( ( exist_pp.small.compareTo(pp.small) == 0 && exist_pp.large.compareTo(pp.large) == 0 )
 					| (exist_pp.small.compareTo(pp.large) == 0 && exist_pp.large.compareTo(pp.small) == 0 ) ) {
@@ -112,7 +101,9 @@ public class BruteCollinearPoints {
 			if (points[p] == null) throw new java.lang.IllegalArgumentException("There is a null point in point array!");
 		}
 		for (int p=0; p < points.length-1; p++) {
-			if (points[p].compareTo(points[p+1]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
+			for (int q=p+1; q < points.length; q++) {
+				if (points[p].compareTo(points[q]) == 0) throw new java.lang.IllegalArgumentException("There exists points with same coordinates!");
+			}
 		}
 }
 	
